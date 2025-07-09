@@ -80,7 +80,34 @@ class BPETokenizer:
         """
 
         token_ids = []
-        # Implement special token encoding
+        if allowed_special is not None and len(allowed_special) > 0:
+            # Build regex to match allowed special tokens
+            special_pattern = ("(" + "|".join(re.escape(tok) for tok in sorted(allowed_special, key=len, reverse=True)) + ")")
+
+            last_index = 0
+            for match in re.finditer(special_pattern, text):
+                prefix = text[last_index:match.start()]
+                # Encode prefix without special handling
+                token_ids.extend(self.encode(prefix, allowed_special=None))
+
+                special_token = match.group(0)
+                if special_token in self.inverse_vocab:
+                    token_ids.append(self.inverse_vocab[special_token])
+                else:
+                    raise ValueError(f"Special token {special_token} not found in vocabulary.")
+                last_index = match.end()
+            
+            # Remaining part to process normally
+            text = text[last_index:]
+
+            # Check if any disallowed special tokens are in the remainder
+            disallowed = [
+                tok for tok in self.inverse_vocab 
+                if tok.startswith("<|") and tok.endswith("|>") and tok in text and tok not in allowed_special
+            ]
+
+            if disallowed:
+                raise ValueError(f"Disallowed special tokens encounterd in text : {disallowed}")
 
         # If no special tokens or remaining text after special token split
         tokens = []
