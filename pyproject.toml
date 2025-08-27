@@ -1,11 +1,11 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools", "wheel", "setuptools-rust"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "Lucid"
 version = "0.1.0"
-description = "Library to simplify Training"
+description = "Library to simplify Training with high-performance Rust core"
 authors = [
     {name = "Kushal Gajjar", email = "kushalgajjar1@gmail.com"}
 ]
@@ -16,3 +16,8 @@ dependencies = []
 
 [project.urls]
 "Homepage" = "https://github.com/KushalGajjar1/Lucid"
+
+[tool.setuptools-rust]
+binding = "PyO3"
+module-name = "lucid_tokenizer"
+target = "lucid_tokenizer"
